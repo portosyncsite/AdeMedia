@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ade Media</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --text: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.6);
+    --accent: #00ecff;
+    --accent-grad: linear-gradient(135deg, #0072ff, #00ecff);
+    
+    /* Liquid Hyper-Glass Pro */
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.01));
+    --glass-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.15);
+    --blur: blur(30px);
+    
+    /* Cinematic Dark Blue Aurora */
+    --bg-grad: radial-gradient(at 0% 0%, #050b18 0px, transparent 50%),
+               radial-gradient(at 100% 0%, #0a1931 0px, transparent 50%),
+               radial-gradient(at 50% 50%, #15305b 0px, transparent 60%),
+               radial-gradient(at 80% 100%, #111e36 0px, transparent 50%),
+               #050b18;
+}
+
+body.light {
+    --text: #0f172a;
+    --text-muted: rgba(15, 23, 42, 0.65);
+    --accent: #2563eb;
+    --accent-grad: linear-gradient(135deg, #1d4ed8, #2563eb);
+    --glass-bg: rgba(255, 255, 255, 0.45);
+    --glass-border: linear-gradient(135deg, rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.02));
+    --glass-shadow: 0 20px 50px rgba(15, 23, 42, 0.06);
+    --bg-grad: radial-gradient(at 0% 0%, #f8fafc 0px, transparent 50%),
+               radial-gradient(at 100% 0%, #e0f2fe 0px, transparent 50%),
+               radial-gradient(at 50% 100%, #f1f5f9 0px, transparent 60%),
+               #f8fafc;
+}
+
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
+    background: var(--bg-grad);
+    background-size: 140% 140%;
+    animation: liquidBg 16s ease infinite alternate;
+    transition: background 0.5s ease, color 0.4s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes liquidBg {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+/* FLOATING HEADER */
+header {
+    margin: 25px auto 0;
+    width: 92%;
+    max-width: 1400px;
+    padding: 14px 36px;
+    border-radius: 100px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    box-shadow: var(--glass-shadow);
+    position: relative;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header::before, .card::before, .hero-container::before, .btn-live::before, footer::before, .hero-card-3d::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--glass-border);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.logo img {
+    height: 38px;
+    display: block;
+    transition: transform 0.3s;
+}
+.logo img:hover { transform: scale(1.03); }
+
+nav { display: flex; gap: 40px; align-items: center; }
+nav a {
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    opacity: 0.75;
+    transition: opacity 0.3s, transform 0.3s;
+}
+nav a:hover { opacity: 1; transform: translateY(-1px); }
+
+/* TOGGLE DESIGN */
+.toggle { position: relative; width: 50px; height: 26px; }
+.toggle input { display: none; }
+.slider {
+    position: absolute;
+    inset: 0;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+}
+body.light .slider { background: rgba(0,0,0,0.06); }
+.slider:before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+body.light .slider:before { background: #0f172a; }
+input:checked + .slider:before { transform: translateX(24px); }
+
+.menu-btn { display: none; font-size: 24px; cursor: pointer; }
+
+/* GLOBAL WRAPPER */
+main {
+    width: 92%;
+    max-width: 1400px;
+    margin: 5% auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 70px;
+    flex: 1;
+}
+
+/* SPLIT HERO LAYOUT */
+.hero-split {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.hero-left {
+    text-align: left;
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.tagline {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+    display: block;
+}
+
+h1 {
+    font-size: 72px;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2.5px;
+    margin-bottom: 25px;
+}
+h1 span {
+    background: linear-gradient(to right, #00a6ff, #00ecff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+body.light h1 span {
+    background: linear-gradient(to right, #1d4ed8, #2563eb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+    font-size: 18px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 520px;
+    margin-bottom: 35px;
+}
+
+/* CTA BUTTONS */
+.cta-group {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+.btn-live {
+    text-decoration: none;
+    padding: 16px 36px;
+    border-radius: 100px;
+    background: var(--accent-grad);
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 15px 30px rgba(0, 114, 255, 0.3);
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.btn-live:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(0, 114, 255, 0.4);
+}
+.btn-live::before {
+    background: linear-gradient(135deg, rgba(255,255,255,0.4), transparent);
+}
+
+.live-dot {
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.9); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.5; }
+    100% { transform: scale(0.9); opacity: 1; }
+}
+
+.btn-secondary {
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 15px;
+    padding: 10px 20px;
+    transition: opacity 0.3s, transform 0.3s;
+}
+.btn-secondary:hover { opacity: 0.8; transform: translateX(3px); }
+
+/* STATS */
+.stats {
+    display: flex;
+    gap: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    body.light & { border-top-color: rgba(0, 0, 0, 0.08); }
+    padding-top: 35px;
+}
+.stat-item {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.stat-item strong {
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 800;
+    margin-right: 5px;
+}
+
+/* ZONA HERO CU DISTRIBUȚIE AERISITĂ MARI (STILUL ORIGINAL) ȘI COMPLET ANIMATĂ 3D */
+.hero-right {
+    position: relative;
+    height: 600px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeInUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.container-3d-scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    perspective: 1400px;
+    transform-style: preserve-3d;
+}
+
+.hero-card-3d {
+    position: absolute;
+    width: 340px; /* Dimensiune mare originală */
+    padding: 28px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.01);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    box-shadow: var(--glass-shadow);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s, background 0.3s;
+    cursor: pointer;
+}
+body.light .hero-card-3d { background: rgba(255, 255, 255, 0.65); }
+body.light .hero-card-3d:hover { background: #ffffff; }
+
+/* Poziționarea asimetrică aerisită din structura ta inițială */
+.hero-card-3d:nth-child(1) {
+    top: 20px;
+    left: 5%;
+    z-index: 1;
+    opacity: 0.5;
+    filter: blur(1px);
+    animation: floatAsym1 6s ease-in-out infinite alternate;
+}
+.hero-card-3d:nth-child(2) {
+    top: 180px;
+    left: 22%;
+    z-index: 3;
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.03);
+    animation: floatAsym2 5s ease-in-out infinite alternate;
+}
+.hero-card-3d:nth-child(3) {
+    bottom: 30px;
+    right: 2%;
+    z-index: 2;
+    opacity: 0.8;
+    animation: floatAsym3 7s ease-in-out infinite alternate;
+}
+
+/* Efecte intense la hover pe scenă */
+.container-3d-scene:hover .hero-card-3d {
+    opacity: 0.3;
+    filter: blur(2px);
+}
+.container-3d-scene .hero-card-3d:hover {
+    z-index: 10;
+    opacity: 1 !important;
+    filter: blur(0px) !important;
+    background: rgba(255, 255, 255, 0.06);
+    /* Iese în față puternic pe axa Z */
+    transform: scale(1.05) translateZ(80px) translateY(-10px) !important;
+    box-shadow: 0 35px 60px rgba(0, 236, 255, 0.15), var(--glass-shadow);
+}
+
+/* Keyframes Plutire Fluidă 3D de adâncime */
+@keyframes floatAsym1 {
+    0% { transform: translateY(0px) rotateX(10deg) rotateY(-10deg) translateZ(0px); }
+    100% { transform: translateY(-15px) rotateX(6deg) rotateY(-6deg) translateZ(20px); }
+}
+@keyframes floatAsym2 {
+    0% { transform: translateY(0px) rotateX(-5deg) rotateY(12deg) translateZ(40px); }
+    100% { transform: translateY(15px) rotateX(5deg) rotateY(4deg) translateZ(60px); }
+}
+@keyframes floatAsym3 {
+    0% { transform: translateY(0px) rotateX(8deg) rotateY(-8deg) translateZ(-20px); }
+    100% { transform: translateY(-20px) rotateX(-2deg) rotateY(-2deg) translateZ(10px); }
+}
+
+.hero-card-3d .tag {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: block;
+}
+.hero-card-3d h3 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+}
+.hero-card-3d p {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* LOWER MAIN HYPER-GLASS BOX (Complet intactă, neschimbată) */
+.hero-container {
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    box-shadow: var(--glass-shadow);
+    padding: 50px 40px;
+    border-radius: 32px;
+    position: relative;
+    animation: fadeInUp 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+body.light .hero-container { background: rgba(255,255,255,0.3); }
+
+.hero-container h2 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 6px;
+}
+
+.productions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 35px;
+}
+
+/* Cardurile de jos - păstrate exact cum au fost create inițial */
+.productions .card {
+    position: relative;
+    width: 100%;
+    padding: 30px 28px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    box-shadow: var(--glass-shadow);
+    transition: transform 0.3s ease, background 0.3s;
+    cursor: pointer;
+}
+body.light .productions .card { background: rgba(255, 255, 255, 0.65); }
+body.light .productions .card:hover { background: #ffffff; }
+
+.productions .card:hover {
+    transform: translateY(-5px);
+}
+
+.card-tag {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: block;
+}
+.card h3 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+}
+.card p {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* FOOTER */
+footer {
+    width: 92%;
+    max-width: 1400px;
+    margin: 40px auto 30px;
+    padding: 24px 40px;
+    border-radius: 100px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    box-shadow: var(--glass-shadow);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    position: relative;
+}
+
+/* MOBILE MENU */
+.mobile-menu {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 11, 24, 0.5);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 12%;
+    gap: 25px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+.mobile-menu.active { opacity: 1; pointer-events: auto; }
+.mobile-menu a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.mobile-menu.active a { opacity: 1; transform: translateY(0); }
+
+.mobile-menu .close-icon {
+    position: absolute;
+    top: 30px;
+    right: 6%;
+    font-size: 40px;
+    cursor: pointer;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* RESPONSIVE COMPLET ADAPTAT PENTRU MOBIL ȘI TABLETĂ - PĂSTREAZĂ ASIMETRIA FĂRĂ SĂ LE SUPRAPUNĂ PROST */
+@media(max-width: 1080px) {
+    .hero-split {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    h1 { font-size: 56px; }
+    
+    /* Pe mobil/tabletă menținem așezarea aerisită originală, dar le adaptăm dimensiunea la ecran */
+    .hero-right { 
+        height: 520px; 
+    }
+    .container-3d-scene {
+        perspective: 1000px;
+    }
+    .hero-card-3d {
+        width: 280px; /* Redimensionat discret pentru ecrane mai mici */
+        padding: 20px;
+    }
+    
+    /* Poziționare aerisită, asimetrică, adaptată pentru ecrane tactile (nu sunt una peste alta) */
+    .hero-card-3d:nth-child(1) {
+        top: 10px;
+        left: 2%;
+        opacity: 0.7;
+        filter: none;
+        transform: rotateX(8deg) rotateY(-8deg);
+        animation: floatAsym1 6s ease-in-out infinite alternate;
+    }
+    .hero-card-3d:nth-child(2) {
+        top: 150px;
+        right: 2%;
+        left: unset; /* Îl mutăm ușor în dreapta pentru layout echilibrat pe mobil */
+        opacity: 1;
+        transform: rotateX(-4deg) rotateY(8deg);
+        animation: floatAsym2 5s ease-in-out infinite alternate;
+    }
+    .hero-card-3d:nth-child(3) {
+        bottom: 10px;
+        left: 8%;
+        right: unset;
+        opacity: 0.85;
+        transform: rotateX(6deg) rotateY(-4deg);
+        animation: floatAsym3 7s ease-in-out infinite alternate;
+    }
+    
+    /* Dezactivăm comportamentul de blur la hover general pe mobil (pentru a evita bug-urile de touch) */
+    .container-3d-scene:hover .hero-card-3d { opacity: unset; filter: none; }
+    
+    footer { border-radius: 24px; padding: 20px; }
+    nav, header .toggle { display: none; }
+    .menu-btn { display: block; }
+}
+
+@media(max-width: 480px) {
+    h1 { font-size: 44px; }
+    .hero-right { height: 580px; }
+    
+    /* Ajustări fine pentru ecrane foarte înguste de telefon */
+    .hero-card-3d {
+        width: 250px;
+    }
+    .hero-card-3d:nth-child(1) { left: 0; top: 10px; }
+    .hero-card-3d:nth-child(2) { right: 0; top: 190px; }
+    .hero-card-3d:nth-child(3) { left: 5%; bottom: 10px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+  <a href="/">
+    <img id="siteLogo" src="ademedia.png" alt="Ade Media Logo">
+  </a>
+</div>
+
+    <nav>
+        <a href="/despre">DESPRE</a>
+        <a href="/contact">CONTACT</a>
+        <a href="/live">LIVE</a>
+        <a href="https://player.ademedia.ro">ADE PLAYER</a>
+    </nav>
+
+    <label class="toggle">
+        <input type="checkbox" id="modeToggle">
+        <span class="slider"></span>
+    </label>
+
+    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+</header>
+
+<!-- MOBILE OVERLAY MENU -->
+<div class="mobile-menu" id="mobileMenu">
+    <div class="close-icon" onclick="toggleMenu()">×</div>
+    <a href="/despre">DESPRE</a>
+    <a href="/contact">CONTACT</a>
+    <a href="/live">LIVE</a>
+    <a href="https://player.ademedia.ro">ADE PLAYER</a>
+    
+    <div style="margin-top: 30px; display: flex; align-items: center; gap: 15px;">
+        <span style="font-size: 13px; font-weight: 700; opacity: 0.6; letter-spacing: 1px;">MOD LUMINOS</span>
+        <label class="toggle">
+            <input type="checkbox" id="mobileModeToggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+</div>
+
+<main>
+    <!-- TOP SECTION: HERO LAYOUT WITH TEXT & LARGE ASYMMETRIC 3D FLOATING CARDS -->
+    <div class="hero-split">
+        <div class="hero-left">
+            <span class="tagline">Televiziune Online Românească</span>
+            <h1>Televiziune.<br><span>Altfel.</span></h1>
+            <p class="subtitle">Emisiuni, talk-show-uri și proiecte media direct din inima României. Mai fresh, mai curajos, direct pe ecranul tău.</p>
+            
+            <div class="cta-group">
+                <a href="/live" class="btn-live">
+                    <span class="live-dot"></span>
+                    Urmărește LIVE
+                </a>
+                <a href="/despre" class="btn-secondary">Despre Noi &rarr;</a>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item"><strong>8</strong> Canale</div>
+                <div class="stat-item"><strong>4</strong> Producții</div>
+                <div class="stat-item"><strong>24/7</strong> Live</div>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE: LARGE ASYMMETRIC 3D ANIMATED CARDS (Scurtate & Aerisite) -->
+        <div class="hero-right">
+            <div class="container-3d-scene">
+                <div class="hero-card-3d">
+                    <span class="tag">Talk Show</span>
+                    <h3>mr. Ade SHOW</h3>
+                    <p>Divertisment la cel mai înalt nivel, cu invitați speciali și subiecte incendiare.</p>
+                </div>
+
+                <div class="hero-card-3d">
+                    <span class="tag">INFORMATIV</span>
+                    <h3>NewsJournal</h3>
+                    <p>Afli rapid evenimentele importante care s-au întâmplat în România și în afara ei.</p>
+                </div>
+
+                <div class="hero-card-3d">
+                    <span class="tag">SPORT</span>
+                    <h3>#SPORTARENA</h3>
+                    <p>Prima emisiune de analiză sportivă la rece a tuturor evenimentelor din sport.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM SECTION: MAIN HYPER-GLASS BOX (PĂSTRATĂ COMPLETA ȘI NESCHIMBATĂ) -->
+    <div class="hero-container">
+        <h2>Emisiuni</h2>
+        <p style="color: var(--text-muted); font-size: 15px;">Formate originale difuzate exclusiv online și TV.</p>
+
+        <div class="productions">
+            <div class="card">
+                <span class="card-tag">Talk Show</span>
+                <h3>mr. Ade SHOW</h3>
+                <p>Emisiunea fanion a canalului Ade Plus, difuzată din 31 decembrie 2023. Divertisment la cel mai înalt nivel, cu invitați speciali și subiecte incendiare.</p>
+            </div>
+
+            <div class="card">
+                <span class="card-tag">INFORMATIV</span>
+                <h3>NewsJournal</h3>
+                <p>Ade Media te invită într-un peisaj informativ în care afli evenimentele care s-au întâmplat zilele acestea în România și în afara ei.</p>
+            </div>
+
+            <div class="card">
+                <span class="card-tag">SPORT</span>
+                <h3>#SPORTARENA</h3>
+                <p>Prima Emisiune de Analiză Sportivă la rece a tuturor evenimentelor desfășurate în sportul românesc și internațional.</p>
+            </div>
+
+            <div class="card">
+                <span class="card-tag">Original</span>
+                <h3>#VIDEOCHAT</h3>
+                <p>Un dialog natural, necenzurat și captivant într-un format complet digitalizat și interactiv.</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    &copy; 2026 Ade Media. Toate drepturile rezervate.
+</footer>
+
+<script>
+const toggle = document.getElementById("modeToggle");
+const mobileToggle = document.getElementById("mobileModeToggle");
+const logo = document.getElementById("siteLogo");
+
+function updateTheme(isLight) {
+    if(isLight) {
+        document.body.classList.add("light");
+        logo.src = "ademedia_dark.png";
+        toggle.checked = true;
+        mobileToggle.checked = true;
+    } else {
+        document.body.classList.remove("light");
+        logo.src = "ademedia.png";
+        toggle.checked = false;
+        mobileToggle.checked = false;
+    }
+}
+
+toggle.addEventListener("change", (e) => updateTheme(e.target.checked));
+mobileToggle.addEventListener("change", (e) => updateTheme(e.target.checked));
+
+function toggleMenu() {
+    document.getElementById("mobileMenu").classList.toggle("active");
+}
+</script>
+
+</body>
+</html>
