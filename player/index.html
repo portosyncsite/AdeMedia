@@ -1,1 +1,568 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ade Player</title>
 
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Meta pentru Aplicație (PWA) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ade Player">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000000">
+
+<!-- Manifest pentru Instalare -->
+<link rel="manifest" href="./manifest.json">
+
+<!-- Embed Minimalist (Open Graph & Twitter) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ade Player">
+<meta property="og:description" content="Ade Player – Platforma oficială marca Ade Media. Urmărește live posturile noastre TV și radio, oriunde și oricând.">
+<meta property="og:image" content="AdePlayer_icon.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ade Player">
+<meta name="twitter:description" content="Ade Player – Platforma oficială marca Ade Media. Urmărește live posturile noastre TV și radio, oriunde și oricând.">
+<meta name="twitter:image" content="AdePlayer_icon.png">
+
+<style>
+
+:root{
+  --bg1:#120800;
+  --bg2:#2a1200;
+
+  --glass: rgba(255,255,255,0.08);
+  --glass-strong: rgba(255,255,255,0.12);
+
+  --border: rgba(255,255,255,0.10);
+
+  --text: rgba(255,255,255,0.92);
+
+  --shadow: 0 25px 80px rgba(0,0,0,0.55);
+
+  --radius: 26px;
+
+  --orange1:#ff9500;
+  --orange2:#ffb347;
+
+  --transition: 0.35s cubic-bezier(.22,.61,.36,1);
+}
+
+/* ========== RESET ========== */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+/* ========== BODY FIX CENTER ========== */
+
+body{
+
+  font-family:"Poppins",sans-serif;
+
+  color:var(--text);
+
+  min-height:100vh;
+
+  overflow-x:hidden;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center; /* 🔥 asta repară tot centratul */
+
+  background:
+
+    radial-gradient(700px circle at 10% 10%, #ffb300 0%, transparent 55%),
+
+    radial-gradient(600px circle at 90% 20%, #ff6a00 0%, transparent 60%),
+
+    radial-gradient(800px circle at 50% 100%, #2a1200 0%, transparent 65%),
+
+    linear-gradient(180deg, var(--bg1), var(--bg2));
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes glowPulse {
+  0%,100% { box-shadow: 0 25px 70px rgba(0,0,0,0.55); }
+  50% { box-shadow: 0 35px 100px rgba(255,140,0,0.18); }
+}
+
+/* ========== HEADER ========== */
+
+header{
+  position:sticky;
+  top:14px;
+
+  width:min(1200px,92%);
+  margin:18px auto;
+
+  z-index:999;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.10),
+    rgba(255,255,255,0.04)
+  );
+
+  border:1px solid var(--border);
+
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+
+  border-radius:22px;
+
+  box-shadow: var(--shadow);
+}
+
+.header-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  padding:30px 26px;
+
+  position:relative;
+}
+
+.header-left,
+.header-right{
+  display:flex;
+  gap:18px;
+}
+
+header a{
+  color:rgba(255,255,255,0.9);
+  text-decoration:none;
+  font-weight:600;
+  font-size:.95rem;
+
+  transition:var(--transition);
+}
+
+header a:hover{
+  transform:translateY(-1px);
+  color:#fff;
+}
+
+.header-center{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+}
+
+.header-center img{
+  height:50px;
+  transition:var(--transition);
+}
+
+.header-center img:hover{
+  transform:scale(1.05);
+}
+
+/* ========== SHOW GRID ========== */
+
+.shows-container{
+  width:min(1200px,92%);
+  margin:60px auto;
+
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+
+  animation: fadeUp 0.8s ease both;
+}
+
+/* ========== CARD ========== */
+
+.show-ad{
+  display:flex;
+
+  min-height:230px;
+
+  border-radius:28px;
+  overflow:hidden;
+
+  position:relative;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.07),
+    rgba(255,255,255,0.03)
+  );
+
+  border:1px solid rgba(255,255,255,0.10);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow: 0 25px 70px rgba(0,0,0,0.55);
+
+  transition: 0.4s cubic-bezier(.22,.61,.36,1);
+
+  animation: fadeUp 0.6s ease both;
+}
+
+.show-ad:nth-child(1){ animation-delay:0.05s; }
+.show-ad:nth-child(2){ animation-delay:0.15s; }
+.show-ad:nth-child(3){ animation-delay:0.25s; }
+
+.show-ad:hover{
+  transform: translateY(-8px) scale(1.015);
+  animation: glowPulse 2.5s infinite;
+}
+
+.show-image{
+  width:40%;
+  min-width:40%;
+
+  background-size:cover;
+  background-position:center;
+
+  transform:scale(1.08);
+
+  transition:0.8s cubic-bezier(.22,.61,.36,1);
+
+  filter:contrast(1.05) saturate(1.1);
+}
+
+.show-ad:hover .show-image{
+  transform:scale(1.18);
+}
+
+.show-overlay{
+  position:absolute;
+  inset:0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,0.15),
+      rgba(0,0,0,0.65)
+    );
+}
+
+.show-content{
+  flex:1;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+
+  padding:30px 34px;
+
+  /* 🔥 CINEMATIC DARK DEPTH */
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,0.35),
+      rgba(0,0,0,0.65),
+      rgba(0,0,0,0.85)
+    );
+
+  backdrop-filter: blur(10px);
+}
+
+.show-logo{
+  width:130px;
+  margin-bottom:14px;
+
+  filter:drop-shadow(0 10px 25px rgba(0,0,0,0.6));
+
+  animation: fadeUp 0.6s ease both;
+}
+
+.show-description p{
+  font-size:1rem;
+  line-height:1.75;
+
+  margin-bottom:18px;
+
+  color:rgba(255,255,255,0.88);
+
+  animation: fadeUp 0.7s ease both;
+}
+
+.show-button{
+  position:relative;
+
+  overflow:hidden;
+
+  padding:11px 20px;
+
+  border:none;
+  outline:none;
+
+  border-radius:18px;
+
+  cursor:pointer;
+
+  font-family:"Poppins",sans-serif;
+  font-weight:700;
+  font-size:.92rem;
+  letter-spacing:.5px;
+
+  color:white;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,149,0,0.95),
+      rgba(255,179,71,0.88)
+    );
+
+  backdrop-filter: blur(12px);
+
+  box-shadow:
+    0 10px 35px rgba(255,140,0,0.35),
+    inset 0 1px 1px rgba(255,255,255,0.22);
+
+  transition:
+    transform .35s cubic-bezier(.22,.61,.36,1),
+    box-shadow .35s ease,
+    background .35s ease;
+
+  isolation:isolate;
+}
+
+/* ✨ LIGHT SWEEP */
+.show-button::before{
+  content:"";
+
+  position:absolute;
+
+  top:0;
+  left:-120%;
+
+  width:80%;
+  height:100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,0.45),
+      transparent
+    );
+
+  transform:skewX(-25deg);
+
+  transition:0.8s ease;
+
+  z-index:0;
+}
+
+.show-button:hover::before{
+  left:140%;
+}
+
+/* glow layer */
+.show-button::after{
+  content:"";
+
+  position:absolute;
+  inset:0;
+
+  border-radius:inherit;
+
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(255,255,255,0.25),
+      transparent 70%
+    );
+
+  opacity:.8;
+
+  z-index:-1;
+}
+
+/* text layer */
+.show-button span{
+  position:relative;
+  z-index:2;
+}
+
+/* hover */
+.show-button:hover{
+  transform:translateY(-3px) scale(1.03);
+
+  box-shadow:
+    0 18px 55px rgba(255,140,0,0.55),
+    0 0 35px rgba(255,170,0,0.25);
+
+  background:
+    linear-gradient(
+      135deg,
+      #ff9d00,
+      #ffc266
+    );
+}
+
+/* click */
+.show-button:active{
+  transform:scale(.98);
+}
+
+/* ========== FOOTER ========== */
+
+footer{
+  margin-top:60px;
+
+  text-align:center;
+
+  padding:30px 15px;
+
+  background:rgba(0,0,0,0.35);
+
+  border-top:1px solid rgba(255,255,255,0.08);
+
+  color:rgba(255,255,255,0.7);
+}
+
+@media(max-width:768px){
+
+header{
+    top:10px;
+  }
+
+  .header-inner{
+    min-height:auto;
+
+    padding:18px;
+
+    flex-direction:column;
+    gap:18px;
+  }
+
+  .header-center{
+    position:relative;
+    left:auto;
+    transform:none;
+  }
+
+  .show-ad{
+    flex-direction:column;
+    min-height:auto;
+  }
+
+  .show-image{
+    width:100%;
+    height:200px;
+  }
+
+  .show-content{
+    padding:22px;
+
+    background:
+      linear-gradient(
+        to top,
+        rgba(0,0,0,0.85),
+        rgba(0,0,0,0.35)
+      );
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+
+    <div class="header-left">
+      <a href="https://player.ademedia.ro/despre">DESPRE & CONTACT</a>
+    </div>
+
+    <div class="header-center">
+      <a href="https://player.ademedia.ro">
+        <img src="adeplayer.png" alt="logo">
+      </a>
+    </div>
+
+    <div class="header-right">
+      <a href="https://player.ademedia.ro/live">LIVE</a>
+    </div>
+
+  </div>
+</header>
+
+<div class="shows-container">
+
+  <div class="show-ad">
+    <div class="show-image" style="background-image:url('fundal_Ade_Media.png')"></div>
+    <div class="show-overlay"></div>
+
+    <div class="show-content">
+      <img src="mas_normal_logo.png" class="show-logo">
+
+      <div class="show-description">
+        <p><b> mr. Ade SHOW </b> — o emisiune populară marca Ade Media, difuzată pe Ade Plus încă din 31 decembrie 2023, tipică de Talk-Show și divertisment la nivel înalt. </p>
+        <button class="show-button" onclick="location.href='/live'">APASĂ AICI</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="show-ad">
+    <div class="show-image" style="background-image:url('pulsetalkshowcarton.png')"></div>
+    <div class="show-overlay"></div>
+
+    <div class="show-content">
+      <img src="PulseTALKSHOW_logo.png" class="show-logo">
+
+      <div class="show-description">
+        <p><b>Pulse TALK-SHOW</b> — o producție marca PulseMEDIA, un talk-show în care se discută despre tot ce se întâmplă și faze amuzante.</p>
+        <button class="show-button" onclick="location.href='/live'">APASĂ AICI</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="show-ad">
+    <div class="show-image" style="background-image:url('videochat_background.png')"></div>
+    <div class="show-overlay"></div>
+
+    <div class="show-content">
+      <img src="videochat_logo.png" class="show-logo">
+
+      <div class="show-description">
+        <p><b>#VIDEOCHAT</b> — o producție inedită marca Ade Media, care are ca scop un dialog dintre un baiat și o fată într-un limbaj natural.</p>
+        <button class="show-button" onclick="location.href='/live'">APASĂ AICI</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  © 2026 Ade Player. Toate drepturile rezervate către Ade Media.
+</footer>
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./service-worker.js');
+  });
+}
+</script>
+
+</body>
+</html>
