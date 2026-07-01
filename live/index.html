@@ -1,1 +1,867 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ade Media - LIVE</title>
 
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+  <style>
+    :root {
+      --text: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.6);
+      --accent: #00ecff;
+      --accent-grad: linear-gradient(135deg, #0072ff, #00ecff);
+      
+      /* Liquid Hyper-Glass Pro */
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.01));
+      --glass-shadow: 
+          0 30px 60px rgba(0, 0, 0, 0.4),
+          inset 0 1px 2px rgba(255, 255, 255, 0.15);
+      --blur: blur(30px);
+      
+      /* Cinematic Dark Blue Aurora */
+      --bg-grad: radial-gradient(at 0% 0%, #050b18 0px, transparent 50%),
+                 radial-gradient(at 100% 0%, #0a1931 0px, transparent 50%),
+                 radial-gradient(at 50% 50%, #15305b 0px, transparent 60%),
+                 radial-gradient(at 80% 100%, #111e36 0px, transparent 50%),
+                 #050b18;
+    }
+
+    body.light {
+      --text: #0f172a;
+      --text-muted: rgba(15, 23, 42, 0.65);
+      --accent: #2563eb;
+      --accent-grad: linear-gradient(135deg, #1d4ed8, #2563eb);
+      --glass-bg: rgba(255, 255, 255, 0.45);
+      --glass-border: linear-gradient(135deg, rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.02));
+      --glass-shadow: 0 20px 50px rgba(15, 23, 42, 0.06);
+      --bg-grad: radial-gradient(at 0% 0%, #f8fafc 0px, transparent 50%),
+                 radial-gradient(at 100% 0%, #e0f2fe 0px, transparent 50%),
+                 radial-gradient(at 50% 100%, #f1f5f9 0px, transparent 60%),
+                 #f8fafc;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      overflow-x: hidden;
+      background: var(--bg-grad);
+      background-size: 140% 140%;
+      animation: liquidBg 16s ease infinite alternate;
+      transition: background 0.5s ease, color 0.4s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes liquidBg {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
+    }
+
+    /* FLOATING HEADER */
+    header {
+      margin: 25px auto 0;
+      width: 92%;
+      max-width: 1400px;
+      padding: 14px 36px;
+      border-radius: 100px;
+      background: var(--glass-bg);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: var(--glass-shadow);
+      position: relative;
+      z-index: 90;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      animation: fadeDown 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    header::before, .main-live-grid > div::before, .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: var(--glass-border);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo img {
+      height: 38px;
+      display: block;
+      transition: transform 0.3s;
+    }
+    .logo img:hover { transform: scale(1.03); }
+
+    nav { display: flex; gap: 40px; align-items: center; }
+    nav a {
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      opacity: 0.75;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    nav a:hover { opacity: 1; transform: translateY(-1px); }
+
+    /* TOGGLE DESIGN */
+    .toggle { position: relative; width: 50px; height: 26px; }
+    .toggle input { display: none; }
+    .slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 50px;
+      background: rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+    }
+    body.light .slider { background: rgba(0,0,0,0.06); }
+    .slider:before {
+      content: "";
+      position: absolute;
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    body.light .slider:before { background: #0f172a; }
+    input:checked + .slider:before { transform: translateX(24px); }
+
+    .menu-btn { display: none; font-size: 24px; cursor: pointer; }
+
+    /* MAIN WRAPPER & HEADINGS */
+    main {
+      width: 92%;
+      max-width: 1400px;
+      margin: 4% auto 0;
+      flex: 1;
+      animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 54px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1.1;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+    h1 span {
+      background: linear-gradient(to right, #00a6ff, #00ecff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    body.light h1 span {
+      background: linear-gradient(to right, #1d4ed8, #2563eb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      text-align: left;
+    }
+
+    /* PREMIUM SPLIT LAYOUT */
+    .main-live-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 35px;
+      align-items: start;
+      margin-bottom: 50px;
+    }
+
+    /* STÂNGA: BOXA PLAYERULUI */
+    .player-section {
+      background: var(--glass-bg);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: var(--glass-shadow);
+      padding: 35px;
+      border-radius: 32px;
+      position: relative;
+    }
+
+    .player-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    /* STATUS BADGES */
+    .live-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+    }
+    
+    .live-indicator.status-live {
+      background: rgba(255, 75, 75, 0.15);
+      color: #ff4b4b;
+    }
+    .live-indicator.status-offline {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.4);
+    }
+    body.light .live-indicator.status-offline {
+      background: rgba(0, 0, 0, 0.08);
+      color: rgba(0, 0, 0, 0.4);
+    }
+
+    .live-indicator .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+    .live-indicator.status-live .dot {
+      background: #ff4b4b;
+      animation: pulse 1.5s infinite;
+    }
+    .live-indicator.status-offline .dot {
+      background: rgba(255, 255, 255, 0.4);
+    }
+    body.light .live-indicator.status-offline .dot {
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.5; }
+      100% { transform: scale(0.9); opacity: 1; }
+    }
+
+    .player-section h2 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .video-container-wrapper {
+      position: relative;
+      width: 100%;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      aspect-ratio: 16 / 9;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* AUDIO INTERFACE PENTRU RADIO */
+    .audio-ui-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, #15305b 0%, #050b18 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 25px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      z-index: 2;
+    }
+    body.light .audio-ui-overlay {
+      background: radial-gradient(circle at center, #e0f2fe 0%, #f1f5f9 100%);
+    }
+    .audio-ui-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .radio-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 30px;
+      background: rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
+    body.light .radio-avatar { background: #ffffff; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
+    .radio-avatar img {
+      max-width: 80%;
+      max-height: 80%;
+      object-fit: contain;
+    }
+
+#epgContainer {
+  margin-top: 18px;
+}
+
+.epg-now {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.epg-time {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.epg-desc {
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.epg-next {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.epg-next-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  opacity: .6;
+  margin-bottom: 6px;
+}
+
+    .audio-controls-rack {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px 28px;
+      border-radius: 100px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    body.light .audio-controls-rack {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .audio-btn {
+      background: var(--accent-grad);
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+    .audio-btn:hover { transform: scale(1.05); }
+
+    .volume-box { display: flex; align-items: center; gap: 10px; }
+    .volume-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 80px;
+      height: 4px;
+      border-radius: 5px;
+      background: rgba(255,255,255,0.2);
+      outline: none;
+    }
+    body.light .volume-slider { background: rgba(0,0,0,0.1); }
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+    }
+
+    .audio-time { font-size: 13px; font-weight: 600; opacity: 0.8; min-width: 40px; }
+
+    .audio-wave { display: flex; gap: 4px; height: 25px; align-items: flex-end; }
+    .audio-wave span {
+      width: 3px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 10px;
+      transition: height 0.1s ease;
+    }
+    .audio-wave.playing span { animation: wave 1.2s ease-in-out infinite alternate; }
+    .audio-wave.playing span:nth-child(2) { animation-delay: 0.15s; }
+    .audio-wave.playing span:nth-child(3) { animation-delay: 0.3s; }
+    .audio-wave.playing span:nth-child(4) { animation-delay: 0.45s; }
+    .audio-wave.playing span:nth-child(5) { animation-delay: 0.6s; }
+
+    @keyframes wave { 0% { height: 4px; } 100% { height: 26px; } }
+
+    /* DREAPTA: BOXA CU CARDURILE DE CANALE */
+    .channels-section {
+      background: var(--glass-bg);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: var(--glass-shadow);
+      padding: 35px;
+      border-radius: 32px;
+      position: relative;
+      max-height: 720px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .channels-section h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 20px; }
+    .channels-list { display: flex; flex-direction: column; gap: 16px; overflow-y: auto; padding-right: 5px; }
+    .channels-list::-webkit-scrollbar { width: 5px; }
+    .channels-list::-webkit-scrollbar-track { background: transparent; }
+    .channels-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+    /* CARDURI DETALII */
+    .card {
+      position: relative;
+      width: 100%;
+      padding: 20px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.02);
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 18px;
+      align-items: center;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    body.light .card { background: rgba(255, 255, 255, 0.5); }
+    
+    .card:hover {
+      transform: translateY(-3px);
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+    body.light .card:hover { background: #ffffff; }
+
+    .card.active {
+      background: linear-gradient(135deg, rgba(0, 114, 255, 0.15), rgba(0, 236, 255, 0.1));
+      border: 1px solid rgba(0, 236, 255, 0.3);
+    }
+    body.light .card.active { background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(37, 99, 235, 0.05)); }
+
+    .channel-logo {
+      width: 80px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      padding: 5px;
+    }
+    .channel-logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .card-info { text-align: left; }
+    .card h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.3px; }
+    .card p { color: var(--text-muted); font-size: 13px; line-height: 1.4; }
+
+    /* FOOTER */
+    footer {
+      width: 92%;
+      max-width: 1400px;
+      margin: 20px auto 30px;
+      padding: 24px 40px;
+      border-radius: 100px;
+      background: var(--glass-bg);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: var(--glass-shadow);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 500;
+      position: relative;
+    }
+
+    /* MOBILE OVERLAY */
+    .mobile-menu {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 11, 24, 0.5);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 12%;
+      gap: 25px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .mobile-menu.active { opacity: 1; pointer-events: auto; }
+    .mobile-menu a {
+      color: var(--text);
+      text-decoration: none;
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .mobile-menu.active a { opacity: 1; transform: translateY(0); }
+    .mobile-menu .close-icon { position: absolute; top: 30px; right: 6%; font-size: 40px; cursor: pointer; }
+
+    @media(max-width: 1080px) {
+      .main-live-grid { grid-template-columns: 1fr; gap: 30px; }
+      h1 { font-size: 42px; }
+      nav, header .toggle { display: none; }
+      .menu-btn { display: block; }
+      .channels-section { max-height: unset; }
+    }
+
+    @media(max-width: 480px) {
+      h1 { font-size: 34px; }
+      .player-section, .channels-section { padding: 20px; border-radius: 24px; }
+      footer { border-radius: 24px; padding: 20px; }
+      .card { grid-template-columns: 65px 1fr; gap: 12px; padding: 15px; }
+      .channel-logo { width: 65px; height: 50px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+  <div class="logo">
+  <a href="/">
+    <img id="siteLogo" src="ademedia.png" alt="Ade Media Logo">
+  </a>
+</div>
+    <nav>
+      <a href="/despre">DESPRE</a>
+      <a href="/contact">CONTACT</a>
+      <a href="/live">LIVE</a>
+      <a href="https://player.ademedia.ro">ADE PLAYER</a>
+    </nav>
+    <label class="toggle">
+      <input type="checkbox" id="modeToggle">
+      <span class="slider"></span>
+    </label>
+    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+  </header>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="close-icon" onclick="toggleMenu()">×</div>
+    <a href="/despre">DESPRE</a>
+    <a href="/contact">CONTACT</a>
+    <a href="/live">LIVE</a>
+    <a href="https://player.ademedia.ro">ADE PLAYER</a>
+    <div style="margin-top: 30px; display: flex; align-items: center; gap: 15px;">
+        <span style="font-size: 13px; font-weight: 700; opacity: 0.6; letter-spacing: 1px;">MOD LUMINOS</span>
+        <label class="toggle">
+            <input type="checkbox" id="mobileModeToggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+  </div>
+
+  <main>
+    <h1><span>LIVE</span> Streaming</h1>
+    <p class="subtitle">Alege canalul preferat și urmărește emisiunile noastre în timp real.</p>
+
+    <div class="main-live-grid">
+      <div class="player-section" id="playerBox">
+        <div class="player-header">
+          <h2 id="playerTitle">Selectează un canal</h2>
+          <div class="live-indicator status-offline" id="liveIndicator">
+            <span class="dot"></span> <span id="indicatorText">OFFLINE</span>
+
+          </div>
+        </div>
+
+        <div class="video-container-wrapper">
+          <div class="audio-ui-overlay" id="audioOverlay">
+            <div class="radio-avatar">
+              <img id="audioRadioLogo" src="https://pulseiptv.free.nf/aderadio.png" alt="Radio Logo">
+            </div>
+            <div class="audio-wave" id="audioWave">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="audio-controls-rack">
+              <button class="audio-btn" id="audioPlayBtn" onclick="toggleAudioPlay()">▶</button>
+              <div class="volume-box">
+                <input type="range" class="volume-slider" id="audioVolume" min="0" max="1" step="0.05" value="0.8" oninput="setAudioVolume(this.value)">
+              </div>
+              <div class="audio-time" id="audioTime">00:00</div>
+            </div>
+          </div>
+          <video id="videoPlayer" controls autoplay playsinline></video>
+        </div>
+
+
+  <div id="epgContainer"></div>
+
+      </div>
+
+      <div class="channels-section">
+        <h2>Canale Disponibile</h2>
+        <div class="channels-list" id="channelsContainer"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>&copy; 2026 Ade Media. Toate drepturile rezervate.</footer>
+
+  <script>
+    const toggle = document.getElementById('modeToggle');
+    const mobileToggle = document.getElementById("mobileModeToggle");
+    const logo = document.getElementById('siteLogo');
+
+    function updateTheme(isLight) {
+      if (isLight) {
+        document.body.classList.add('light');
+        logo.src = 'ademedia_dark.png';
+        toggle.checked = true;
+        mobileToggle.checked = true;
+        localStorage.setItem("theme", "light");
+      } else {
+        document.body.classList.remove('light');
+        logo.src = 'ademedia.png';
+        toggle.checked = false;
+        mobileToggle.checked = false;
+        localStorage.setItem("theme", "dark");
+      }
+    }
+
+    toggle.addEventListener('change', (e) => updateTheme(e.target.checked));
+    mobileToggle.addEventListener('change', (e) => updateTheme(e.target.checked));
+    
+    if (localStorage.getItem("theme") === "light") {
+      updateTheme(true);
+    }
+
+    function toggleMenu() { document.getElementById("mobileMenu").classList.toggle("active"); }
+
+    const channels = [
+      { id: "adeplus", name: "Ade Plus", description: "Canalul generalist cu știri, producții proprii și divertisment.", logo: "https://pulseiptv.free.nf/adeplus.png", stream: "https://live.prtsync.ro/hls/adeplus.m3u8", isRadio: false },
+      { id: "adeextra", name: "Ade Extra", description: "Doza ta zilnică de distracție, emisiuni de divertisment și lifestyle.", logo: "https://pulseiptv.free.nf/ade extra monocrom.png", stream: "https://live.prtsync.ro/hls/adeextra.m3u8", isRadio: false },
+      { id: "adepluscl", name: "Ade Plus Călărași", description: "Singurul post local din trustul Ade Media.", logo: "adepluscalarasi.png", stream: "https://live.prtsync.ro/hls/adepluscl.m3u8", isRadio: false },
+      { id: "adeexclusive", name: "Ade Exclusive", description: "Feed dedicat exclusiv marilor evenimente și transmisiunilor unice.", logo: "https://pulseiptv.free.nf/adeexclusive.png", stream: "https://live.prtsync.ro/hls/adeexclusive.m3u8", isRadio: false },
+      { id: "adedocumentary", name: "Ade Documentary", description: "Canalul de documentare - since 2025", logo: "https://pulseiptv.free.nf/adedocumentary.png", stream: "https://live.prtsync.ro/hls/adedocumentary.m3u8", isRadio: false },
+      { id: "ademusic", name: "Ade Music", description: "Cele mai bune hituri de muzică ușoară și manele.", logo: "https://pulseiptv.free.nf/ademusic.png", stream: "https://live.prtsync.ro/hls/ademusic.m3u8", isRadio: false },
+      { id: "adebulgaria", name: "Ade Bulgaria", description: "Cele mai bune hituri de muzică ușoară și manele internaționale.", logo: "https://pulseiptv.free.nf/adebulgaria.png", stream: "https://live.prtsync.ro/hls/adebulgaria.m3u8", isRadio: false },
+      { id: "aderadio", name: "Ade Radio", description: "Ascultă mixul perfect de muzică la postul nostru exclusiv de radio.", logo: "https://pulseiptv.free.nf/aderadio.png", stream: "https://stream.zeno.fm/fcdm6igj1svtv", isRadio: true }
+    ];
+
+    const container = document.getElementById("channelsContainer");
+    let activeCard = null;
+
+    channels.forEach(channel => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.id = `card-${channel.id}`;
+      card.innerHTML = `
+        <div class="channel-logo"><img src="${channel.logo}" alt="${channel.name}"></div>
+        <div class="card-info"><h3>${channel.name}</h3><p>${channel.description}</p></div>
+      `;
+      card.onclick = () => {
+        if(activeCard) activeCard.classList.remove('active');
+        card.classList.add('active');
+        activeCard = card;
+        loadChannel(channel);
+      };
+      container.appendChild(card);
+    });
+
+    let hls;
+    const video = document.getElementById("videoPlayer");
+    const title = document.getElementById("playerTitle");
+const epgContainer = document.getElementById("epgContainer");
+    const liveIndicator = document.getElementById("liveIndicator");
+    const indicatorText = document.getElementById("indicatorText");
+    const audioOverlay = document.getElementById("audioOverlay");
+    const audioRadioLogo = document.getElementById("audioRadioLogo");
+    const audioPlayBtn = document.getElementById("audioPlayBtn");
+    const audioWave = document.getElementById("audioWave");
+    const audioTimeText = document.getElementById("audioTime");
+    const fallbackVideo = "ademediaid.mov";
+    let currentChannel = null;
+
+    video.addEventListener("timeupdate", () => {
+      if (currentChannel && currentChannel.isRadio) {
+        let s = Math.floor(video.currentTime % 60);
+        let m = Math.floor((video.currentTime / 60) % 60);
+        audioTimeText.innerText = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+      }
+    });
+
+    async function checkStreamStatus(url) {
+      try { await fetch(url, { method: 'HEAD', mode: 'no-cors' }); return true; } catch (e) { return false; }
+    }
+
+    function setBadgeState(isLive) {
+      if (isLive) {
+        liveIndicator.className = "live-indicator status-live";
+        indicatorText.innerText = "LIVE";
+      } else {
+        liveIndicator.className = "live-indicator status-offline";
+        indicatorText.innerText = "OFFLINE";
+      }
+    }
+
+function renderEPG(data) {
+
+  if (!data?.acum) {
+    epgContainer.innerHTML = "";
+    return;
+  }
+
+  epgContainer.innerHTML = `
+    <div class="epg-now">
+      ${data.acum.title}
+    </div>
+
+    <div class="epg-time">
+      ${data.acum.start} - ${data.acum.end}
+    </div>
+
+    ${
+      data.acum.description
+        ? `<div class="epg-desc">${data.acum.description}</div>`
+        : ""
+    }
+
+    ${
+      data.next1
+        ? `
+        <div class="epg-next">
+          <div class="epg-next-label">URMEAZĂ</div>
+
+          <div class="epg-now" style="font-size:16px">
+            ${data.next1.title}
+          </div>
+
+          <div class="epg-time">
+            ${data.next1.start} - ${data.next1.end}
+          </div>
+
+          ${
+            data.next1.description
+              ? `<div class="epg-desc">${data.next1.description}</div>`
+              : ""
+          }
+        </div>
+        `
+        : ""
+    }
+  `;
+}
+
+async function loadEPG(channelId) {
+  try {
+    const res = await fetch(
+      `https://api.ademedia.ro/api/v1/epg/read/${channelId}`
+    );
+
+    if (!res.ok) return null;
+
+    return await res.json();
+  } catch (err) {
+    console.error("EPG error:", err);
+    return null;
+  }
+}
+
+    async function loadChannel(channel) {
+      currentChannel = channel;
+      title.innerText = channel.name;
+
+const epg = await loadEPG(channel.id);
+renderEPG(epg);
+
+      setBadgeState(false);
+
+      if (channel.isRadio) {
+        audioOverlay.classList.add("active");
+        audioRadioLogo.src = channel.logo;
+        video.removeAttribute("controls"); 
+        audioPlayBtn.innerText = "⏸";
+        audioWave.classList.add("playing");
+      } else {
+        audioOverlay.classList.remove("active");
+        video.setAttribute("controls", "true");
+      }
+
+      if (window.innerWidth <= 1080) {
+        document.getElementById("playerBox").scrollIntoView({ behavior: "smooth" });
+      }
+
+      stopPlayer();
+      const online = await checkStreamStatus(channel.stream);
+      if(!online) { startFallback(channel.isRadio); return; }
+
+      if (Hls.isSupported() && channel.stream.includes("m3u8")) {
+        hls = new Hls({  enableWorker: true, lowLatencyMode: true });
+        hls.loadSource(channel.stream);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, function() { setBadgeState(true); video.play().catch(() => {}); });
+        hls.on(Hls.Events.ERROR, function(e, data) { if (data.fatal) startFallback(channel.isRadio); });
+      } else {
+        video.src = channel.stream;
+        video.addEventListener("loadedmetadata", onDirectStreamLoad);
+        video.addEventListener("error", onDirectStreamError);
+      }
+    }
+
+    function onDirectStreamLoad() { setBadgeState(true); video.play().catch(() => {}); video.removeEventListener("loadedmetadata", onDirectStreamLoad); }
+    function onDirectStreamError() { startFallback(currentChannel ? currentChannel.isRadio : false); video.removeEventListener("error", onDirectStreamError); }
+    function stopPlayer() { if (hls) { hls.destroy(); hls = null; } video.pause(); video.removeAttribute("src"); video.load(); audioWave.classList.remove("playing"); }
+    function startFallback(isRadio) { stopPlayer(); setBadgeState(false); if (!isRadio) { video.src = fallbackVideo; video.loop = true; video.play().catch(() => {}); } }
+    function toggleAudioPlay() { if (video.paused) { video.play(); audioPlayBtn.innerText = "⏸"; audioWave.classList.add("playing"); } else { video.pause(); audioPlayBtn.innerText = "▶"; audioWave.classList.remove("playing"); } }
+    function setAudioVolume(val) { video.volume = val; }
+
+    window.addEventListener('DOMContentLoaded', () => { if(channels.length > 0) { const firstCard = document.getElementById(`card-${channels[0].id}`); if(firstCard) firstCard.click(); } });
+  </script>
+</body>
+</html>
